@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <title>String Vibrations</title>
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/p5@1.0.0/lib/p5.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.0/dist/tf.min.js"></script>
     <script src="sketch.js"></script>
 </head>
 <body>
-Test
-
 <div id="stringDiv"></div>
+<div class="slidecontainer">
+  <input type="range" min="1" max="6" value="1" class="slider" id="numFourier">
+    <label for="numFourier">Number of Fourier Terms</label>
+</div>
 <div id="x-label"></div>
 <div id="y-label"></div>
 
