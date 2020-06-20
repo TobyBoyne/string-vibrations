@@ -3,6 +3,9 @@ var nodeX = 0,
 	a = 0.5,
 	L = 300,
 	Ns = 1,
+	t = 0,
+	timeScale = 2,
+	damping = 0.005,
 	held = false;
 
 const aMax = 0.99,
@@ -33,28 +36,41 @@ function draw() {
 	const slider = document.getElementById("numFourier");
 	Ns = parseInt(slider.value, 10);
 
+	// start counting time since string was released
 	held = mouseIsPressed && (mouseButton === LEFT);
+	if (held) {t = 0}
 
 
-	// draw string
-	noFill();
-	strokeWeight(4);
-	stroke(colours[0]);
-	beginShape();
-	vertex(node1.x, node1.y);
-	vertex(node1.x + a * L, node1.y + amp);
-	vertex(node2.x, node2.y);
-	endShape();
+	// draw string if being held
+	if (held) {
+		noFill();
+		strokeWeight(4);
+		stroke(colours[0]);
+		beginShape();
+		vertex(node1.x, node1.y);
+		vertex(node1.x + a * L, node1.y + amp);
+		vertex(node2.x, node2.y);
+		endShape();
+	}
 
 	const xs = tf.linspace(0, L, 50),
 		xsArray = xs.dataSync();
 	let sinSum = tf.zerosLike(xs);
 
 	// draw each fourier term as a separate sine wave
+  // if released, multiply by time dependency
+
 	strokeWeight(2);
 	for (n = 1; n < Ns + 1; n++) {
-		const ys = getSin(n, xs),
-			ysArray = ys.dataSync();
+		let ys = getSin(n, xs);
+		const freq = 2 * n / L;
+		let timeArray = tf.mul(2 * PI * n * timeScale * t * freq, tf.onesLike(ys));
+		timeArray = tf.mul(tf.exp(-damping * timeScale * t), tf.cos(timeArray));
+
+		if (!held) {
+			ys = ys.mul(timeArray)
+		}
+		const ysArray = ys.dataSync();
 		sinSum = sinSum.add(ys);
 		stroke(colours[n+1]);
 		beginShape();
@@ -73,6 +89,8 @@ function draw() {
 		vertex(node1.x + xsArray[i], node1.y + sinSumArray[i]);
 	}
 	endShape();
+
+	t += 1
 }
 
 
@@ -96,6 +114,7 @@ function mouseDragged() {
 	}
 
 	amp = (mouseY - node1.y);
+	return false
 }
 
 
