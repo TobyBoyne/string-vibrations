@@ -1,13 +1,15 @@
 var amp = 100,
 	a = 0.5,
-	t = 0;
+	t = 0,
+	held = false;
 
 const nodeX = 50,
 	L = 300,
 	aMax = 0.99,
 	aMin = 0.01,
 	timeScale = 2,
-	damping = 0.005;
+	damping = 0.005,
+	v = 2; // velocity of propagation of wave
 
 const node1 = {x:nodeX, y:200},
   node2 = {x:nodeX+L, y:200};
@@ -38,14 +40,18 @@ function setup() {
 function draw() {
 	background(220);
 	// tf.tidy() deletes tensors from memory after use
-	tf.tidy(() => {
+
 
 	const slider = document.getElementById("numFourier");
-	let Ns = parseInt(slider.value, 10);
-	// start counting time since string was released
-	const held = mouseIsPressed && (mouseButton === LEFT);
-	if (held) {t = 0}
+	const sliderLabel = document.getElementById("numFourierLabel");
+	const showModes = document.getElementById("showModes").checked;
 
+	let Ns = parseInt(slider.value, 10);
+	sliderLabel.innerText = "Number of Fourier Terms = " + Ns;
+
+	if (!mouseIsPressed) {held=false}
+	// start counting time only if string was released
+	if (held) {t = 0}
 
 	// draw string if being held
 	if (held) {
@@ -58,7 +64,7 @@ function draw() {
 		endShape();
 	}
 
-
+	tf.tidy(() => {
 	let sinSum = tf.zerosLike(xs);
 
 	// draw each fourier term as a separate sine wave
@@ -67,7 +73,7 @@ function draw() {
 	strokeWeight(2);
 	for (let n = 1; n < Ns + 1; n++) {
 		let ys = getSin(n, xs);
-		const freq = 2 * n / L;
+		const freq = (n * v) / (2 * L);
 		let timeArray = tf.mul(2 * PI * n * timeScale * t * freq, tf.onesLike(ys));
 		timeArray = tf.mul(tf.exp(-damping * timeScale * t), tf.cos(timeArray));
 
@@ -76,12 +82,15 @@ function draw() {
 		}
 		const ysArray = ys.dataSync();
 		sinSum = sinSum.add(ys);
-		stroke(colours[n+1]);
-		beginShape();
-		for (i = 0; i < xs.shape[0]; i++) {
-			vertex(node1.x + xsArray[i], node1.y + ysArray[i]);
+		const strokeColour = min(n + 1, colours.length - 1);
+		stroke(colours[strokeColour]);
+		if (held || showModes) {
+			beginShape();
+			for (i = 0; i < xs.shape[0]; i++) {
+				vertex(node1.x + xsArray[i], node1.y + ysArray[i]);
+			}
+			endShape()
 		}
-		endShape();
 	}
 
 	const sinSumArray = sinSum.dataSync();
@@ -109,8 +118,10 @@ function getSin(n) {
 
 function mouseDragged() {
 	// do not update if mouse is outside of canvas, or if not left click
-	if (mouseX < 0 || mouseX > width || mouseY < 0 || mouseY > width || mouseButton !== LEFT) {}
+	if (mouseX < 0 || mouseX > width || mouseY < 0 || mouseY > width) {held=false}
+	else if (mouseButton !== LEFT) {}
 	else {
+		held = true;
 		a = (mouseX - node1.x) / L;
 		if (a > aMax) {
 			a = aMax
@@ -120,13 +131,4 @@ function mouseDragged() {
 
 		amp = (mouseY - node1.y);
 	}
-}
-
-
-function updateLabels(x, y){
-  var xLabel = document.getElementById('x-label');
-	xLabel.innerHTML = 'X: ' + x;
-
-	var yLabel = document.getElementById('y-label');
-	yLabel.innerHTML = 'Y: ' + y;
 }

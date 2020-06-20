@@ -9,12 +9,15 @@
 </head>
 <body>
 <div id="stringDiv"></div>
-<div class="slidecontainer">
-  <input type="range" min="1" max="6" value="1" class="slider" id="numFourier">
-    <label for="numFourier">Number of Fourier Terms</label>
+<div class="options">
+  <input type="range" min="1" max="10" value="1" class="slider" id="numFourier">
+    <label id="numFourierLabel"></label>
+   <input type="checkbox" value="show" checked id="showModes">
+    <label>Show modes during vibration</label>
 </div>
-<div id="x-label"></div>
-<div id="y-label"></div>
+
+
+
 
 </body>
 </html>
