@@ -5,10 +5,13 @@ var nodeX = 0,
 	Ns = 1,
 	held = false;
 
-var node1 = {x:50, y:200},
+const aMax = 0.99,
+	aMin = 0.01;
+
+const node1 = {x:50, y:200},
   node2 = {x:50+L, y:200};
 
-var colours = [
+const colours = [
 	"#000000",
 	"#3c3c3c",
 	"#c80212",
@@ -29,18 +32,9 @@ function draw() {
 	background(220);
 	const slider = document.getElementById("numFourier");
 	Ns = parseInt(slider.value, 10);
-	console.log(Ns);
 
-	const aMax = 0.99,
-		aMin = 0.01;
+	held = mouseIsPressed && (mouseButton === LEFT);
 
-	a = (mouseX - node1.x) / L;
-	if (a > aMax) {
-		a = aMax
-	} else if (a < aMin) {
-		a = aMin
-	}
-	amp = (mouseY - node1.y);
 
 	// draw string
 	noFill();
@@ -48,7 +42,7 @@ function draw() {
 	stroke(colours[0]);
 	beginShape();
 	vertex(node1.x, node1.y);
-	vertex(node1.x + a * L, mouseY);
+	vertex(node1.x + a * L, node1.y + amp);
 	vertex(node2.x, node2.y);
 	endShape();
 
@@ -68,7 +62,6 @@ function draw() {
 			vertex(node1.x + xsArray[i], node1.y + ysArray[i]);
 		}
 		endShape();
-		console.log(n, Ns + 1)
 	}
 
 	const sinSumArray = sinSum.dataSync();
@@ -89,6 +82,22 @@ function getSin(n, xs) {
 	let sins = tf.mul(xs, n * PI / L).sin();
 	return tf.mul(a_n, sins)
 }
+
+function mouseDragged() {
+	// do not update if mouse is outside of canvas, or if not left click
+	if (mouseX < 0 || mouseX > width || mouseY < 0 || mouseY > width) {return false}
+	if (mouseButton !== LEFT) {return false}
+
+	a = (mouseX - node1.x) / L;
+	if (a > aMax) {
+		a = aMax
+	} else if (a < aMin) {
+		a = aMin
+	}
+
+	amp = (mouseY - node1.y);
+}
+
 
 function updateLabels(x, y){
   var xLabel = document.getElementById('x-label');
