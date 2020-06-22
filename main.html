@@ -9,11 +9,22 @@
 </head>
 <body>
 <div id="stringDiv"></div>
-<div class="options">
-  <input type="range" min="1" max="10" value="1" class="slider" id="numFourier">
-    <label id="numFourierLabel"></label>
-   <input type="checkbox" value="show" checked id="showModes">
-    <label>Show modes during vibration</label>
+<div id="sliders">
+    <table>
+        <tr>
+            <td class="descr">Number of Modes</td>
+            <td class="val"><label id="Ns"></label></td>
+            <td><input type="range" min="1" max="10" value="1" class="slider" id="numFourier"></td>
+        </tr>
+
+        <tr>
+
+        </tr>
+       <input type="checkbox" value="show" class="checkbox" checked id="showModes">
+        <label>Show modes</label>
+        <input type="checkbox" value="show" class="checkbox" checked id="showModesMotion">
+        <label>Show modes during vibration</label>
+    </table>
 </div>
 
 

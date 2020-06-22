@@ -17,11 +17,10 @@ const node1 = {x:nodeX, y:200},
 const xs = tf.linspace(0, L, 50),
 		xsArray = xs.dataSync();
 
-// var ys = tf.zeros()
 
 const colours = [
 	"#000000",
-	"#3c3c3c",
+	"rgba(28,28,28,0.44)",
 	"#c80212",
 	"#8e4c19",
 	"#c8bf24",
@@ -39,15 +38,19 @@ function setup() {
 
 function draw() {
 	background(220);
-	// tf.tidy() deletes tensors from memory after use
-
 
 	const slider = document.getElementById("numFourier");
-	const sliderLabel = document.getElementById("numFourierLabel");
+	const sliderLabel = document.getElementById("Ns");
+
 	const showModes = document.getElementById("showModes").checked;
+	const checkboxModesMotion = document.getElementById("showModesMotion");
+	const showModesMotion = checkboxModesMotion.checked;
 
 	let Ns = parseInt(slider.value, 10);
-	sliderLabel.innerText = "Number of Fourier Terms = " + Ns;
+	sliderLabel.innerText = Ns;
+
+	// if modes are never shown, disable checkbox for showing modes in motion
+	checkboxModesMotion.disabled = !showModes;
 
 	if (!mouseIsPressed) {held=false}
 	// start counting time only if string was released
@@ -56,7 +59,7 @@ function draw() {
 	// draw string if being held
 	if (held) {
 		strokeWeight(4);
-		stroke(colours[0]);
+		stroke(colours[1]);
 		beginShape();
 		vertex(node1.x, node1.y);
 		vertex(node1.x + a * L, node1.y + amp);
@@ -64,6 +67,7 @@ function draw() {
 		endShape();
 	}
 
+	// tf.tidy() deletes tensors from memory after use
 	tf.tidy(() => {
 	let sinSum = tf.zerosLike(xs);
 
@@ -71,11 +75,13 @@ function draw() {
   // if released, multiply by time dependency
 
 	strokeWeight(2);
+	const dampingFactor = tf.exp(-damping * timeScale * t);
+
 	for (let n = 1; n < Ns + 1; n++) {
 		let ys = getSin(n, xs);
 		const freq = (n * v) / (2 * L);
 		let timeArray = tf.mul(2 * PI * n * timeScale * t * freq, tf.onesLike(ys));
-		timeArray = tf.mul(tf.exp(-damping * timeScale * t), tf.cos(timeArray));
+		timeArray = tf.mul(dampingFactor, tf.cos(timeArray));
 
 		if (!held) {
 			ys = ys.mul(timeArray)
@@ -84,7 +90,7 @@ function draw() {
 		sinSum = sinSum.add(ys);
 		const strokeColour = min(n + 1, colours.length - 1);
 		stroke(colours[strokeColour]);
-		if (held || showModes) {
+		if (showModes && (held || showModesMotion)) {
 			beginShape();
 			for (i = 0; i < xs.shape[0]; i++) {
 				vertex(node1.x + xsArray[i], node1.y + ysArray[i]);
@@ -96,7 +102,8 @@ function draw() {
 	const sinSumArray = sinSum.dataSync();
 
 	// plot fourier approximation of curve
-	stroke(colours[1]);
+	stroke(colours[0]);
+	strokeWeight(4);
 	beginShape();
 	for (let i = 0; i < xs.shape[0]; i++) {
 		vertex(node1.x + xsArray[i], node1.y + sinSumArray[i]);
