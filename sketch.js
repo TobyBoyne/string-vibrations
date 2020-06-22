@@ -7,9 +7,7 @@ const nodeX = 50,
 	L = 300,
 	aMax = 0.99,
 	aMin = 0.01,
-	timeScale = 2,
-	damping = 0.005,
-	v = 2; // velocity of propagation of wave
+	timeScale = 2;
 
 const node1 = {x:nodeX, y:200},
   node2 = {x:nodeX+L, y:200};
@@ -39,15 +37,32 @@ function setup() {
 function draw() {
 	background(220);
 
-	const slider = document.getElementById("numFourier");
-	const sliderLabel = document.getElementById("Ns");
+	const nSlider = document.getElementById("numFourier"),
+		nSliderLabel = document.getElementById("Ns");
+
+	let Ns = parseInt(nSlider.value, 10);
+	nSliderLabel.innerText = nSlider.value;
+
+
+	const vSlider = document.getElementById("velocity"),
+		vSliderLabel = document.getElementById("v");
+
+	let v = parseFloat(vSlider.value);
+	vSliderLabel.innerText = v.toFixed(1);
+
+
+	const dampSlider = document.getElementById("damping"),
+		dampSliderLabel = document.getElementById("lambda");
+
+	let damping = parseFloat(dampSlider.value);
+	dampSliderLabel.innerText = damping.toFixed(3);
+
 
 	const showModes = document.getElementById("showModes").checked;
 	const checkboxModesMotion = document.getElementById("showModesMotion");
 	const showModesMotion = checkboxModesMotion.checked;
 
-	let Ns = parseInt(slider.value, 10);
-	sliderLabel.innerText = Ns;
+
 
 	// if modes are never shown, disable checkbox for showing modes in motion
 	checkboxModesMotion.disabled = !showModes;

@@ -12,16 +12,27 @@
 <div id="sliders">
     <table>
         <tr>
-            <td class="descr">Number of Modes</td>
+            <td class="descr">N</td>
             <td class="val"><label id="Ns"></label></td>
             <td><input type="range" min="1" max="10" value="1" class="slider" id="numFourier"></td>
         </tr>
 
         <tr>
-
+            <td class="descr">v</td>
+            <td class="val"><label id="v"></label></td>
+            <td><input type="range" min="0.1" max="9.9" value="2" step="0.1" class="slider" id="velocity"></td>
         </tr>
+
+        <tr>
+            <td class="descr">lambda</td>
+            <td class="val"><label id="lambda"></label></td>
+            <td><input type="range" min="0" max="0.02" value="0.005" step="0.001" class="slider" id="damping"></td>
+        </tr>
+
+
        <input type="checkbox" value="show" class="checkbox" checked id="showModes">
         <label>Show modes</label>
+        <br>
         <input type="checkbox" value="show" class="checkbox" checked id="showModesMotion">
         <label>Show modes during vibration</label>
     </table>
