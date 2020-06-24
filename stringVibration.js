@@ -52,7 +52,7 @@ function draw() {
 
 
 	const dampSlider = document.getElementById("damping"),
-		dampSliderLabel = document.getElementById("lambda");
+		dampSliderLabel = document.getElementById("c");
 
 	let damping = parseFloat(dampSlider.value);
 	dampSliderLabel.innerText = damping.toFixed(3);
@@ -65,7 +65,8 @@ function draw() {
 
 
 	// if modes are never shown, disable checkbox for showing modes in motion
-	checkboxModesMotion.disabled = !showModes;
+	const modesOption = document.getElementById("modesOption");
+	modesOption.style.display = showModes ? "inline" : "none";
 
 	if (!mouseIsPressed) {held=false}
 	// start counting time only if string was released
